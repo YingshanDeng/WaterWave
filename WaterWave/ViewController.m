@@ -85,24 +85,22 @@
 
 - (CGPathRef)waterWavePath
 {
-    CGMutablePathRef path = CGPathCreateMutable();
-    
-    CGPathMoveToPoint(path, nil, 0, self.waterWaveHeight);
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    [path moveToPoint:CGPointMake(0, self.waterWaveHeight)];
     
     CGFloat y = 0.0f;
     for (float x = 0; x <= ScreenRect.size.width; x ++)
     {
         y= self.zoomY * sin( x / 180 * M_PI - 4 * self.translateX / M_PI ) * 5 + self.waterWaveHeight;
-        CGPathAddLineToPoint(path, nil, x, y);
+        [path addLineToPoint:CGPointMake(x, y)];
     }
+    [path addLineToPoint:CGPointMake(ScreenRect.size.width, ScreenRect.size.height)];
+    [path addLineToPoint:CGPointMake(0, ScreenRect.size.height)];
+    [path addLineToPoint:CGPointMake(0, self.waterWaveHeight)];
+    [path closePath];
     
-    CGPathAddLineToPoint(path, nil, ScreenRect.size.width, ScreenRect.size.height);
-    CGPathAddLineToPoint(path, nil, 0, ScreenRect.size.height);
-    CGPathAddLineToPoint(path, nil, 0, self.waterWaveHeight);
-
-    return (CGPathRef)path;
+    return [path CGPath];
 }
-
 
 - (void)startDisplayLink
 {
@@ -137,8 +135,6 @@
         }
     }
     
-    // 内存释放问题 -- 重要
-    CGPathRelease(self.shapeLayer.path);
     self.shapeLayer.path = [self waterWavePath];
 }
 
